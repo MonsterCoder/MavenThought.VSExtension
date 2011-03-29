@@ -43,11 +43,9 @@
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-
       <Group guid="guidMavenThought_VSExtensionCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
       </Group>
-      
     </Groups>
     
     <!--Buttons section. -->
@@ -80,8 +78,6 @@
           <ButtonText>MavenThought</ButtonText>
         </Strings>
       </Button>
-
-
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -96,10 +92,6 @@
     </Bitmaps>
  
   </Commands>
-
-
-
-
 
   <Symbols>
     <!-- This is the package guid. -->
