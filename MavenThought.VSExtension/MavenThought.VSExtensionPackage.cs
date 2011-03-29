@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -53,7 +54,7 @@ namespace GeorgeChen.MavenThought_VSExtension
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            var elements = new List<object>();
+            var classElements = new List<CodeElement2>();
 
             if (this.dte == null)
             {
@@ -62,12 +63,40 @@ namespace GeorgeChen.MavenThought_VSExtension
 
             var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
 
-            CollectElements(elements, fileCodeModel.CodeElements);
+            CollectElements(classElements, fileCodeModel.CodeElements, new[] {vsCMElement.vsCMElementClass});
 
-            var naviWindow = new TestListWindow { DataContext = elements };
-            naviWindow.ShowDialog();
+            foreach (CodeClass classElement in classElements)
+            {
+                var classItem = ClassItemFactory.Create(classElement);
+                var naviWindow = new TestListWindow { DataContext = classItem };
+                naviWindow.ShowDialog();
+            }
         }
 
+        /// <summary>
+        /// Collect code elements information
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="elements"></param>
+        /// <param name="filter"></param>
+        private void CollectElements(ICollection<CodeElement2> list, CodeElements elements, IEnumerable<vsCMElement> filter)
+        {        
+            if (elements == null || elements.Count == 0)
+            {
+                return;
+            }
+
+            foreach (CodeElement2 p in elements)
+            {
+                Trace.WriteLine(String.Format("+ {0}", p.Kind));
+                if (filter.Contains(p.Kind))
+                {
+                    list.Add(p);
+                }
+
+                CollectElements(list, p.Children, filter);
+            }
+        }
 
         /// <summary>
         /// This function is called when the user clicks the menu item that shows the tool window. 
@@ -85,30 +114,54 @@ namespace GeorgeChen.MavenThought_VSExtension
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
-        /// <summary>
-        /// Collect code elements information
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="elements"></param>
-        private void CollectElements(ICollection<object> list, CodeElements elements)
-        {        
-            if (elements == null || elements.Count == 0)
-            {
-                return;
-            }
+    }
 
-            foreach (CodeElement2 p in elements)
-            {
-                if (p.Kind == vsCMElement.vsCMElementNamespace
-                    || p.Kind == vsCMElement.vsCMElementClass
-                    || p.Kind == vsCMElement.vsCMElementFunction)
-                {
-                    list.Add(p.Name);
-                }
-
-                CollectElements(list, p.Children);
-            }
+    internal static class ClassItemFactory
+    {
+        public static ClassItem Create(CodeClass classElement)
+        {
+            //var isTest = HasSpecificationAttribute(classElement);
+            //return new ClassItem(isTest, classElement.Name, classElement.Namespace.Name);
+            return null;
         }
 
+        //static bool HasSpecificationAttribute(CodeClass classElement)
+        //{
+        //    var attrs = classElement.Attributes;
+
+        //    if (attrs == null || attrs.Count == 0)
+        //    {
+        //        return false;
+        //    }
+          
+        //    if (attrs.Cast<CodeAttribute>().Count(a => a.Name.Contains("Specification")) > 0)
+        //    {
+        //        return true;
+        //    }
+
+        //   return classElement.Bases
+        //       .Cast<CodeElement>()
+        //       .Where(e => e.Kind == vsCMElement.vsCMElementClass)
+        //       .Count(c => HasSpecificationAttribute((CodeClass) c)) > 0;
+        //}
     }
+
+    public class ClassItem
+    {
+        public ClassItem(bool isTest, string name, string codeNamespace)
+        {
+            Name = name;
+            CodeNamespace = codeNamespace;
+            IsTestClass = isTest;
+        }
+
+        public string Name { get; private set; }
+
+        public string CodeNamespace { get; set; }
+
+        public bool IsTestClass { get; private set; }
+
+        public bool IsTestSpecification { get; private set; }
+    }
+
 }
