@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using System.Windows;
-using System.Windows.Controls;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -23,23 +21,7 @@ namespace GeorgeChen.MavenThought_VSExtension
     [Guid(GuidList.guidMavenThought_VSExtensionPkgString)]
     public sealed class MavenThought_VSExtensionPackage : Package
     {
-        DTE dte;
-
-        /// <summary>
-        /// This function is called when the user clicks the menu item that shows the 
-        /// tool window. 
-        /// </summary>
-        private void ShowToolWindow(object content)
-        {
-            var window = this.FindToolWindow(typeof(MyToolWindow), 0, true);
-            if ((null == window) || (null == window.Frame))
-            {
-                throw new NotSupportedException(Resources.CanNotCreateWindow);
-            }
-            window.Content = "ddddd";
-            var windowFrame = (IVsWindowFrame)window.Frame;
-            ErrorHandler.ThrowOnFailure(windowFrame.Show());
-        }
+        DTE2 dte;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -71,19 +53,62 @@ namespace GeorgeChen.MavenThought_VSExtension
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
+            var elements = new List<object>();
+
             if (this.dte == null)
             {
-                this.dte = GetService(typeof(DTE)) as DTE; 
-            }
-            var projects = new List<string>();
-
-            foreach (dynamic p in dte.Solution.Projects)
-            {
-                projects.Add(p.Name);
+                this.dte = GetService(typeof(DTE)) as DTE2; 
             }
 
-            var naviWindow = new TestListWindow { DataContext = projects };
+            var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
+
+            CollectElements(elements, fileCodeModel.CodeElements);
+
+            var naviWindow = new TestListWindow { DataContext = elements };
             naviWindow.ShowDialog();
         }
+
+
+        /// <summary>
+        /// This function is called when the user clicks the menu item that shows the tool window. 
+        /// </summary>
+        private void ShowToolWindow(object content)
+        {
+            var window = this.FindToolWindow(typeof(MyToolWindow), 0, true);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException(Resources.CanNotCreateWindow);
+            }
+
+            window.Content = content;
+            var windowFrame = (IVsWindowFrame)window.Frame;
+            ErrorHandler.ThrowOnFailure(windowFrame.Show());
+        }
+
+        /// <summary>
+        /// Collect code elements information
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="elements"></param>
+        private void CollectElements(ICollection<object> list, CodeElements elements)
+        {        
+            if (elements == null || elements.Count == 0)
+            {
+                return;
+            }
+
+            foreach (CodeElement2 p in elements)
+            {
+                if (p.Kind == vsCMElement.vsCMElementNamespace
+                    || p.Kind == vsCMElement.vsCMElementClass
+                    || p.Kind == vsCMElement.vsCMElementFunction)
+                {
+                    list.Add(p.Name);
+                }
+
+                CollectElements(list, p.Children);
+            }
+        }
+
     }
 }
