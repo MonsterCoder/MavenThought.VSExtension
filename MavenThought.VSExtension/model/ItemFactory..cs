@@ -27,9 +27,14 @@ namespace GeorgeChen.MavenThought_VSExtension.model
 
             var item = list.Cast<CodeClass>().First();
 
-            if (item.IsDerivedFrom["MavenThought.Commons.Testing.BaseTest"] && item.Name.Contains("Specification"))
+            if (item.IsDerivedFrom["MavenThought.Commons.Testing.BaseTest"])
             {
-                return new SpecificationItem(item.Name, item.Namespace.Name, item.FullName);
+                if (item.Name.Contains("Specification"))
+                {
+                    return new SpecificationItem(item.Name, item.Namespace.Name, item.FullName);  
+                }
+
+                return new SenarioItem(item.Name, item.Namespace.Name, item.FullName);
             }
 
             return new ClassItem(item.Name, item.Namespace.Name, item.FullName);
@@ -42,7 +47,7 @@ namespace GeorgeChen.MavenThought_VSExtension.model
         /// <param name="list"></param>
         /// <param name="elements"></param>
         /// <param name="filter"></param>
-        private static void CollectElements(ICollection<CodeElement2> list, CodeElements elements, IEnumerable<vsCMElement> filter)
+        public static void CollectElements(ICollection<CodeElement2> list, CodeElements elements, IEnumerable<vsCMElement> filter)
         {
             if (elements == null || elements.Count == 0)
             {
@@ -60,21 +65,5 @@ namespace GeorgeChen.MavenThought_VSExtension.model
                 CollectElements(list, p.Children, filter);
             }
         }
-
-
-        private static bool DerivedFromBaseTest(CodeClass classElement)
-        {
-            //if (classElement.Name == "BaseTest")
-            //{
-            //    return true;
-            //}
-
-            //return classElement.Bases
-            //           .Cast<CodeElement>()
-            //           .Where(e => e.Kind == vsCMElement.vsCMElementClass)
-            //           .Count(c => DerivedFromBaseTest((CodeClass)c)) > 0;
-            return false;
-        }
-
     }
 }

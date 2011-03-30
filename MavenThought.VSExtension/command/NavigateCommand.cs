@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using EnvDTE;
@@ -52,7 +50,21 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// <param name="item"></param>
         private void Open(SpecificationItem item)
         {
-            MessageBox.Show("SpecificationItem");
+            var classname = item.Name.Replace("Specification", "");
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                foreach (ProjectItem projectItem in project.ProjectItems)
+                {
+                    if (projectItem.FileCodeModel != null)
+                    {
+                        if (Path.GetFileNameWithoutExtension(projectItem.Name) == classname)
+                        {
+                           var w = projectItem.Open(Constants.vsViewKindCode);
+                            w.Visible = true;
+                        }
+                    }
+                }
+            }   
         }        
         
         /// <summary>

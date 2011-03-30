@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using System.Windows;
 using EnvDTE;
 using EnvDTE80;
 using GeorgeChen.MavenThought_VSExtension.command;
-using GeorgeChen.MavenThought_VSExtension.model;
 using Microsoft.VisualStudio.Shell;
 
 namespace GeorgeChen.MavenThought_VSExtension
