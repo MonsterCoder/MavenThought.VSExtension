@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -20,6 +22,18 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         public event EventHandler CanExecuteChanged = delegate { };
 
         /// <summary>
+        /// Defines the method that determines whether the command can execute in its current state.
+        /// </summary>
+        /// <returns>
+        /// true if this command can be executed; otherwise, false.
+        /// </returns>
+        /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Defines the method to be called when the command is invoked.
         /// </summary>
         /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
@@ -35,36 +49,23 @@ namespace GeorgeChen.MavenThought_VSExtension.command
                 Open(codeItem);
         }
 
+
         /// <summary>
         /// Open a class item
         /// </summary>
         /// <param name="item"></param>
         private void Open(ClassItem item)
         {
-            MessageBox.Show("ClassItem");
-        }        
-        
+            NavigateTo(item.Name + "Specification");
+        }
+
         /// <summary>
         /// Open a specification item
         /// </summary>
         /// <param name="item"></param>
         private void Open(SpecificationItem item)
         {
-            var classname = item.Name.Replace("Specification", "");
-            foreach (Project project in _dte.Solution.Projects)
-            {
-                foreach (ProjectItem projectItem in project.ProjectItems)
-                {
-                    if (projectItem.FileCodeModel != null)
-                    {
-                        if (Path.GetFileNameWithoutExtension(projectItem.Name) == classname)
-                        {
-                           var w = projectItem.Open(Constants.vsViewKindCode);
-                            w.Visible = true;
-                        }
-                    }
-                }
-            }   
+            NavigateTo(item.Name.Replace("Specification", ""));
         }        
         
         /// <summary>
@@ -76,19 +77,64 @@ namespace GeorgeChen.MavenThought_VSExtension.command
             MessageBox.Show("SenarioItem");
         }
 
-        /// <summary>
-        /// Defines the method that determines whether the command can execute in its current state.
-        /// </summary>
-        /// <returns>
-        /// true if this command can be executed; otherwise, false.
-        /// </returns>
-        /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
-        public bool CanExecute(object parameter)
+        private void NavigateTo(string target)
         {
-            return true;
+            //var projects = 
+            foreach (Project project in _dte.Solution.Projects)
+            {
+  
+                if (ExamProjectItems(project.ProjectItems, target))
+                {
+                    return;
+                }
+            }
         }
 
+        private bool ExamProjectItems(ProjectItems projectItems, string target)
+        {
+            if (projectItems == null)
+            {
+                return false;
+            }
 
+            foreach (ProjectItem projectItem in projectItems)
+            {
 
+                if (projectItem.FileCodeModel != null)
+                {
+                    if (Path.GetFileNameWithoutExtension(projectItem.Name) == target)
+                    {
+                        var w = projectItem.Open(Constants.vsViewKindCode);
+                        w.Visible = true;
+                        return true;
+                    }
+                }
+                else if (projectItem.SubProject != null)
+                {
+                    if (ExamProjectItems(projectItem.SubProject.ProjectItems, target))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }
+
+//Debug.WriteLine("-------------------- \n project name: " + project.Name );
+
+//foreach (ProjectItem item in project.ProjectItems)
+//{
+//    Debug.WriteLine("\n                      item name: " + item.Name);
+//    if (item.SubProject != null) Debug.WriteLine("\n                               subProjects: " + item.SubProject.Name);
+//    if (item.ProjectItems != null)
+//    {
+//        foreach (ProjectItem subitem in item.ProjectItems)
+//        {
+//            Debug.WriteLine("\n                                                       project Item: " +
+//                            subitem.Name);
+//        }
+//    }
+//}
