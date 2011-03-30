@@ -113,11 +113,14 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClassItem.VSExtensionPackage.cs" />
-    <Compile Include="ClassItemFactory.VSExtensionPackage.cs" />
-    <Compile Include="MyControl.xaml.cs">
-      <DependentUpon>MyControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="command\NavigateCommand.cs" />
+    <Compile Include="model\ClassItem.cs" />
+    <Compile Include="model\ItemFactory..cs" />
+    <Compile Include="model\CodeItem.cs" />
+    <Compile Include="model\OtherItem.cs" />
+    <Compile Include="model\SenarioItem.cs" />
+    <Compile Include="model\SpecificationItem.cs" />
+    <Compile Include="model\TestItem.cs" />
     <Compile Include="MyToolWindow.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -165,15 +168,12 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MyControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="TestListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
