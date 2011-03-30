@@ -63,14 +63,10 @@ namespace GeorgeChen.MavenThought_VSExtension
 
             var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
 
-            CollectElements(classElements, fileCodeModel.CodeElements, new[] {vsCMElement.vsCMElementClass});
+            CollectElements(classElements, fileCodeModel.CodeElements, new[] { vsCMElement.vsCMElementClass });
 
-            foreach (CodeClass classElement in classElements)
-            {
-                var classItem = ClassItemFactory.Create(classElement);
-                var naviWindow = new TestListWindow { DataContext = classItem };
-                naviWindow.ShowDialog();
-            }
+            var naviWindow = new TestListWindow { DataContext = classElements.Select(ce => ClassItemFactory.Create((CodeClass)ce)) };
+            naviWindow.ShowDialog();
         }
 
         /// <summary>
@@ -80,7 +76,7 @@ namespace GeorgeChen.MavenThought_VSExtension
         /// <param name="elements"></param>
         /// <param name="filter"></param>
         private void CollectElements(ICollection<CodeElement2> list, CodeElements elements, IEnumerable<vsCMElement> filter)
-        {        
+        {
             if (elements == null || elements.Count == 0)
             {
                 return;
@@ -113,55 +109,5 @@ namespace GeorgeChen.MavenThought_VSExtension
             var windowFrame = (IVsWindowFrame)window.Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
-
     }
-
-    internal static class ClassItemFactory
-    {
-        public static ClassItem Create(CodeClass classElement)
-        {
-            //var isTest = HasSpecificationAttribute(classElement);
-            //return new ClassItem(isTest, classElement.Name, classElement.Namespace.Name);
-            return null;
-        }
-
-        //static bool HasSpecificationAttribute(CodeClass classElement)
-        //{
-        //    var attrs = classElement.Attributes;
-
-        //    if (attrs == null || attrs.Count == 0)
-        //    {
-        //        return false;
-        //    }
-          
-        //    if (attrs.Cast<CodeAttribute>().Count(a => a.Name.Contains("Specification")) > 0)
-        //    {
-        //        return true;
-        //    }
-
-        //   return classElement.Bases
-        //       .Cast<CodeElement>()
-        //       .Where(e => e.Kind == vsCMElement.vsCMElementClass)
-        //       .Count(c => HasSpecificationAttribute((CodeClass) c)) > 0;
-        //}
-    }
-
-    public class ClassItem
-    {
-        public ClassItem(bool isTest, string name, string codeNamespace)
-        {
-            Name = name;
-            CodeNamespace = codeNamespace;
-            IsTestClass = isTest;
-        }
-
-        public string Name { get; private set; }
-
-        public string CodeNamespace { get; set; }
-
-        public bool IsTestClass { get; private set; }
-
-        public bool IsTestSpecification { get; private set; }
-    }
-
 }

@@ -113,6 +113,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassItem.VSExtensionPackage.cs" />
+    <Compile Include="ClassItemFactory.VSExtensionPackage.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
     </Compile>

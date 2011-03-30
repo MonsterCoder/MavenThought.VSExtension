@@ -3,10 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TestListWindow" Height="300" Width="300">
     <Grid>
-        <ItemsControl ItemsSource="{Binding}">
+        <ItemsControl x:Name="itemscontrl" ItemsSource="{Binding}">
             <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}"/>
+                <DataTemplate >
+                    <StackPanel>
+                        <TextBlock Text="{Binding IsTestClass}"/>
+                        <TextBlock Text="{Binding CodeNamespace}"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
