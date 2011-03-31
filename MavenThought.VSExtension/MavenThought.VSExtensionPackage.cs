@@ -4,6 +4,7 @@ using System.ComponentModel.Design;
 using EnvDTE;
 using EnvDTE80;
 using GeorgeChen.MavenThought_VSExtension.command;
+using GeorgeChen.MavenThought_VSExtension.model;
 using Microsoft.VisualStudio.Shell;
 
 namespace GeorgeChen.MavenThought_VSExtension
@@ -54,14 +55,14 @@ namespace GeorgeChen.MavenThought_VSExtension
                 navigateCmd = new NavigateCommand(dte);
             }
 
-            var fileCodeModel = dte.ActiveDocument.ProjectItem.FileCodeModel;
+            var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
 
             if (fileCodeModel == null)
             {
                 return;
             }
-
-            navigateCmd.Execute(fileCodeModel);
+            
+            navigateCmd.Execute(ItemFactory.Create(fileCodeModel));
         }
     }
 }

@@ -115,7 +115,7 @@
   <ItemGroup>
     <Compile Include="command\NavigateCommand.cs" />
     <Compile Include="model\ClassItem.cs" />
-    <Compile Include="model\ItemFactory..cs" />
+    <Compile Include="model\ItemFactory.cs" />
     <Compile Include="model\CodeItem.cs" />
     <Compile Include="model\OtherItem.cs" />
     <Compile Include="model\SenarioItem.cs" />

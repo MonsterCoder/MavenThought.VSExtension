@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Windows;
 using System.Windows.Input;
 using EnvDTE;
 using EnvDTE80;
@@ -39,12 +37,12 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
         public void Execute(object parameter)
         {
-                if ((parameter == null) || !(parameter is FileCodeModel2))
+                if ((parameter == null) || !(parameter is CodeItem))
                 {
                     return;
                 }
 
-                dynamic codeItem = ItemFactory.Create((FileCodeModel2)parameter);
+                dynamic codeItem = parameter;
 
                 Open(codeItem);
         }
@@ -79,10 +77,10 @@ namespace GeorgeChen.MavenThought_VSExtension.command
 
         private void NavigateTo(string target)
         {
-            _dte.Solution.Projects.Cast<Project>().Any(project => ExamProjectItems(project.ProjectItems, target));
+            _dte.Solution.Projects.Cast<Project>().Any(project => SearchAndOpen(project.ProjectItems, target));
         }
 
-        private bool ExamProjectItems(ProjectItems projectItems, string target)
+        private bool SearchAndOpen(ProjectItems projectItems, string target)
         {
             if (projectItems == null)
             {
@@ -103,7 +101,7 @@ namespace GeorgeChen.MavenThought_VSExtension.command
                 }
                 else if (projectItem.SubProject != null)
                 {
-                    if (ExamProjectItems(projectItem.SubProject.ProjectItems, target))
+                    if (SearchAndOpen(projectItem.SubProject.ProjectItems, target))
                     {
                         return true;
                     }
@@ -114,19 +112,3 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         }
     }
 }
-
-//Debug.WriteLine("-------------------- \n project name: " + project.Name );
-
-//foreach (ProjectItem item in project.ProjectItems)
-//{
-//    Debug.WriteLine("\n                      item name: " + item.Name);
-//    if (item.SubProject != null) Debug.WriteLine("\n                               subProjects: " + item.SubProject.Name);
-//    if (item.ProjectItems != null)
-//    {
-//        foreach (ProjectItem subitem in item.ProjectItems)
-//        {
-//            Debug.WriteLine("\n                                                       project Item: " +
-//                            subitem.Name);
-//        }
-//    }
-//}
