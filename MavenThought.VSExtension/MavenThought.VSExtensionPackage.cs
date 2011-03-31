@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using EnvDTE;
@@ -52,15 +53,15 @@ namespace GeorgeChen.MavenThought_VSExtension
 
             if (navigateCmd == null)
             {
-                navigateCmd = new NavigateCommand(dte);
+                navigateCmd = new NavigateCommand(dte.Solution.Projects.Cast<Project>());
             }
 
-            var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
-
-            if (fileCodeModel == null)
+            if (dte.ActiveDocument == null || dte.ActiveDocument.ProjectItem.FileCodeModel == null)
             {
                 return;
             }
+
+            var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
             
             navigateCmd.Execute(ItemFactory.Create(fileCodeModel));
         }

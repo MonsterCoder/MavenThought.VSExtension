@@ -1,20 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Windows.Input;
 using EnvDTE;
-using EnvDTE80;
 using GeorgeChen.MavenThought_VSExtension.model;
 
 namespace GeorgeChen.MavenThought_VSExtension.command
 {
     public class NavigateCommand : ICommand
     {
-        private readonly DTE2 _dte;
+        private readonly IEnumerable<Project> _projects;
 
-        public NavigateCommand(DTE2 dte)
+        public NavigateCommand(IEnumerable<Project> projects)
         {
-            _dte = dte;
+            _projects = projects;
         }
 
         public event EventHandler CanExecuteChanged = delegate { };
@@ -45,7 +45,6 @@ namespace GeorgeChen.MavenThought_VSExtension.command
                 Open(parameter);
         }
 
-
         /// <summary>
         /// Open a class item
         /// </summary>
@@ -75,7 +74,7 @@ namespace GeorgeChen.MavenThought_VSExtension.command
 
         private void NavigateTo(string target)
         {
-            _dte.Solution.Projects.Cast<Project>().Any(project => SearchAndOpen(project.ProjectItems, target));
+            _projects.Any(project => SearchAndOpen(project.ProjectItems, target));
         }
 
         private bool SearchAndOpen(ProjectItems projectItems, string target)
