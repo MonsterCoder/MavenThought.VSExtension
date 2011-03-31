@@ -35,16 +35,14 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// Defines the method to be called when the command is invoked.
         /// </summary>
         /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
-        public void Execute(object parameter)
+        public void Execute(dynamic  parameter)
         {
                 if ((parameter == null) || !(parameter is CodeItem))
                 {
                     return;
                 }
 
-                dynamic codeItem = parameter;
-
-                Open(codeItem);
+                Open(parameter);
         }
 
 
