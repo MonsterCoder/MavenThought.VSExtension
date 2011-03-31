@@ -74,20 +74,12 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// <param name="item"></param>
         private void Open(SenarioItem item)
         {
-            MessageBox.Show("SenarioItem");
+            Open(item.Specification);
         }
 
         private void NavigateTo(string target)
         {
-            //var projects = 
-            foreach (Project project in _dte.Solution.Projects)
-            {
-  
-                if (ExamProjectItems(project.ProjectItems, target))
-                {
-                    return;
-                }
-            }
+            _dte.Solution.Projects.Cast<Project>().Any(project => ExamProjectItems(project.ProjectItems, target));
         }
 
         private bool ExamProjectItems(ProjectItems projectItems, string target)

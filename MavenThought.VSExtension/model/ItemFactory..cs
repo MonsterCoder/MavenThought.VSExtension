@@ -34,7 +34,10 @@ namespace GeorgeChen.MavenThought_VSExtension.model
                     return new SpecificationItem(item.Name, item.Namespace.Name, item.FullName);  
                 }
 
-                return new SenarioItem(item.Name, item.Namespace.Name, item.FullName);
+                var spec = (CodeClass)item.Bases.Cast<CodeElement>().First(ce => ce is CodeClass);
+                var spItem = new SpecificationItem(spec.Name, spec.Namespace.Name, spec.FullName);
+
+                return new SenarioItem(item.Name, item.Namespace.Name, item.FullName, spItem);
             }
 
             return new ClassItem(item.Name, item.Namespace.Name, item.FullName);
