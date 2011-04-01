@@ -78,7 +78,7 @@ namespace GeorgeChen.MavenThought_VSExtension
             var testProjectname = string.Format("{0}.Tests", e.Source.Item.ContainingProject.Name);
             var targetProject = FindProject(dte.Solution.Projects.Cast<Project>(), testProjectname);
 
-            if (targetProject!=null)
+            if (targetProject==null)
             {
                 MessageBox.Show(string.Format("Do you want to create test project {0}?", testProjectname));
                 //var specitem = targetProject.ProjectItems.AddFromTemplate(e.SpecName, e.SpecName);
@@ -94,7 +94,7 @@ namespace GeorgeChen.MavenThought_VSExtension
                 return null;
             }
 
-           var target = projects.FirstOrDefault(p => p.Name == testProjectname &&  p.Kind != ProjectKinds.vsProjectKindSolutionFolder);
+            var target = projects.FirstOrDefault(p => p.Name.Equals(testProjectname, StringComparison.InvariantCultureIgnoreCase) && p.Kind != ProjectKinds.vsProjectKindSolutionFolder);
 
            if (target!= null)
            {
@@ -113,11 +113,7 @@ namespace GeorgeChen.MavenThought_VSExtension
                 return null;
             }
 
-           var target = items.FirstOrDefault(item => (item.Name == testProjectname));
-            foreach (ProjectItem pr in items)
-            {
-                Debug.WriteLine("+++++ project item: " + pr.Name);
-            }
+           var target = items.FirstOrDefault(item => (item.Name.Equals(testProjectname, StringComparison.InvariantCultureIgnoreCase)));
 
            if (target != null)
            {
