@@ -85,6 +85,10 @@ namespace GeorgeChen.MavenThought_VSExtension
                 //var w = specitem.Open(Constants.vsViewKindCode);
                 //w.Visible = true;
             }
+            else
+            {
+               /// targetProject.ProjectItems.AddFromTemplate("CSharpProjects", "CSharpProjects");
+            }
         }
 
         private Project FindProject(IEnumerable<Project> projects, string testProjectname)
