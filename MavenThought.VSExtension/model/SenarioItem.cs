@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using EnvDTE;
 
 namespace GeorgeChen.MavenThought_VSExtension.model
 {
@@ -8,7 +9,8 @@ namespace GeorgeChen.MavenThought_VSExtension.model
     public class SenarioItem : ClassItem
     {
 
-        public SenarioItem(string name, string codeNamespace, string fullname, SpecificationItem spItem) : base(name, codeNamespace, fullname)
+        public SenarioItem(string name, string codeNamespace, string fullname, SpecificationItem spItem, ProjectItem item)
+            : base(name, codeNamespace, fullname, item)
         {
             Specification = spItem;
         }

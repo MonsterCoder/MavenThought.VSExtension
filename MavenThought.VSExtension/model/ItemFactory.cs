@@ -9,12 +9,6 @@ namespace GeorgeChen.MavenThought_VSExtension.model
 {
     internal static class ItemFactory
     {
-        public static ClassItem Create(CodeClass classElement)
-        {
-            return null;
-            //var isTest = DerivedFromBaseTest(classElement);
-            //return new ClassItem(isTest, classElement.Name, classElement.Namespace.Name);
-        }
 
         public static CodeItem Create(FileCodeModel2 codeModel)
         {
@@ -22,7 +16,7 @@ namespace GeorgeChen.MavenThought_VSExtension.model
             CollectElements(list, codeModel.CodeElements, new [] { vsCMElement.vsCMElementClass });
             if (list.Count == 0)
             {
-                return new OtherItem("Unknow");
+                return new OtherItem("Unknow", null);
             }
 
             var item = list.Cast<CodeClass>().First();
@@ -31,16 +25,16 @@ namespace GeorgeChen.MavenThought_VSExtension.model
             {
                 if (item.Name.Contains("Specification"))
                 {
-                    return new SpecificationItem(item.Name, item.Namespace.Name, item.FullName);  
+                    return new SpecificationItem(item.Name, item.Namespace.Name, item.FullName, item.ProjectItem);  
                 }
 
                 var spec = (CodeClass)item.Bases.Cast<CodeElement>().First(ce => ce is CodeClass);
-                var spItem = new SpecificationItem(spec.Name, spec.Namespace.Name, spec.FullName);
+                var spItem = new SpecificationItem(spec.Name, spec.Namespace.Name, spec.FullName, item.ProjectItem);
 
-                return new SenarioItem(item.Name, item.Namespace.Name, item.FullName, spItem);
+                return new SenarioItem(item.Name, item.Namespace.Name, item.FullName, spItem, item.ProjectItem);
             }
 
-            return new ClassItem(item.Name, item.Namespace.Name, item.FullName);
+            return new ClassItem(item.Name, item.Namespace.Name, item.FullName, item.ProjectItem);
         }
 
 

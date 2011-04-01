@@ -6,6 +6,7 @@ using EnvDTE;
 using EnvDTE80;
 using GeorgeChen.MavenThought_VSExtension.command;
 using GeorgeChen.MavenThought_VSExtension.model;
+using GeorgeChen.MavenThought_VSExtension.OptionDialog;
 using Microsoft.VisualStudio.Shell;
 
 namespace GeorgeChen.MavenThought_VSExtension
@@ -17,6 +18,7 @@ namespace GeorgeChen.MavenThought_VSExtension
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.guidMavenThought_VSExtensionPkgString)]
+    [ProvideOptionPage(typeof(MavenThoughtOptions), "MavenThought", "Unit Test", 0, 0, true)]
     public sealed class MavenThought_VSExtensionPackage : Package
     {
         DTE2 dte;
@@ -53,7 +55,8 @@ namespace GeorgeChen.MavenThought_VSExtension
 
             if (navigateCmd == null)
             {
-                navigateCmd = new NavigateCommand(dte.Solution.Projects.Cast<Project>());
+                navigateCmd = new NavigateCommand(dte);
+                navigateCmd.CreateSpecificationRequest += HandleCreateSpecificationRequest;
             }
 
             if (dte.ActiveDocument == null || dte.ActiveDocument.ProjectItem.FileCodeModel == null)
@@ -64,6 +67,11 @@ namespace GeorgeChen.MavenThought_VSExtension
             var fileCodeModel = (FileCodeModel2)dte.ActiveDocument.ProjectItem.FileCodeModel;
             
             navigateCmd.Execute(ItemFactory.Create(fileCodeModel));
+        }
+
+        private void HandleCreateSpecificationRequest(object sender, SpecificationEventArgs e)
+        {
+          /// dte.Solution.FindProjectItem()
         }
     }
 }

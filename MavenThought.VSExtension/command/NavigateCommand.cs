@@ -1,23 +1,24 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Windows.Input;
 using EnvDTE;
+using EnvDTE80;
 using GeorgeChen.MavenThought_VSExtension.model;
 
 namespace GeorgeChen.MavenThought_VSExtension.command
 {
     public class NavigateCommand : ICommand
     {
-        private readonly IEnumerable<Project> _projects;
+        private readonly DTE2 _dte;
 
-        public NavigateCommand(IEnumerable<Project> projects)
+        public NavigateCommand(DTE2 dte)
         {
-            _projects = projects;
+            _dte = dte;
         }
 
         public event EventHandler CanExecuteChanged = delegate { };
+
+        public event EventHandler<SpecificationEventArgs> CreateSpecificationRequest = delegate { };
 
         /// <summary>
         /// Defines the method that determines whether the command can execute in its current state.
@@ -37,7 +38,7 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
         public void Execute(dynamic  parameter)
         {
-                if ((parameter == null) || !(parameter is CodeItem))
+            if ((_dte.Solution==null)||(parameter == null) || !(parameter is CodeItem))
                 {
                     return;
                 }
@@ -48,19 +49,23 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// <summary>
         /// Open a class item
         /// </summary>
-        /// <param name="item"></param>
-        private void Open(ClassItem item)
+        /// <param name="target"></param>
+        private void Open(ClassItem target)
         {
-            NavigateTo(item.Name + "Specification");
+          if  (!NavigateTo(string.Format("{0}{1}{2}", target.Name , "Specification", Path.GetExtension(target.Item.Name))))
+            
+          {
+              CreateSpecificationRequest(this, new SpecificationEventArgs(target));
+          }
         }
 
         /// <summary>
         /// Open a specification item
         /// </summary>
-        /// <param name="item"></param>
-        private void Open(SpecificationItem item)
+        /// <param name="target"></param>
+        private void Open(SpecificationItem target)
         {
-            NavigateTo(item.Name.Replace("Specification", ""));
+            NavigateTo(string.Format("{0}{1}",target.Name.Replace("Specification", ""),  Path.GetExtension(target.Item.Name)));
         }        
         
         /// <summary>
@@ -72,40 +77,18 @@ namespace GeorgeChen.MavenThought_VSExtension.command
             Open(item.Specification);
         }
 
-        private void NavigateTo(string target)
+        private bool NavigateTo(string target)
         {
-            _projects.Any(project => SearchAndOpen(project.ProjectItems, target));
-        }
+            var item = _dte.Solution.FindProjectItem(target);
 
-        private bool SearchAndOpen(ProjectItems projectItems, string target)
-        {
-            if (projectItems == null)
+            if (item == null)
             {
                 return false;
             }
 
-            foreach (ProjectItem projectItem in projectItems)
-            {
-
-                if (projectItem.FileCodeModel != null)
-                {
-                    if (Path.GetFileNameWithoutExtension(projectItem.Name) == target)
-                    {
-                        var w = projectItem.Open(Constants.vsViewKindCode);
-                        w.Visible = true;
-                        return true;
-                    }
-                }
-                else if (projectItem.SubProject != null)
-                {
-                    if (SearchAndOpen(projectItem.SubProject.ProjectItems, target))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            var w = item.Open(Constants.vsViewKindCode);
+            w.Visible = true;
+            return true;
         }
     }
 }

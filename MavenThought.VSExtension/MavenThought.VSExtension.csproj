@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="command\NavigateCommand.cs" />
+    <Compile Include="command\SpecificationEventArgs.cs" />
     <Compile Include="model\ClassItem.cs" />
     <Compile Include="model\ItemFactory.cs" />
     <Compile Include="model\CodeItem.cs" />
@@ -123,6 +124,9 @@
     <Compile Include="model\TestItem.cs" />
     <Compile Include="MyToolWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="OptionDialog\MavenThoughtOptions.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -1,4 +1,7 @@
-﻿namespace GeorgeChen.MavenThought_VSExtension.model
+﻿using System.IO;
+using EnvDTE;
+
+namespace GeorgeChen.MavenThought_VSExtension.model
 {
     /// <summary>
     /// Class Item
@@ -11,7 +14,9 @@
         /// <param name="name"></param>
         /// <param name="codeNamespace"></param>
         /// <param name="fullname"></param>
-        public ClassItem(string name, string codeNamespace, string fullname) : base(name)
+        /// <param name="item"></param>
+        public ClassItem(string name, string codeNamespace, string fullname, ProjectItem item)
+            : base(name, item)
         {
             CodeNamespace = codeNamespace;
             Fullname = fullname;
