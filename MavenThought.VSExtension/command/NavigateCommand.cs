@@ -52,11 +52,11 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         /// <param name="target"></param>
         private void Open(ClassItem target)
         {
-          if  (!NavigateTo(string.Format("{0}{1}{2}", target.Name , "Specification", Path.GetExtension(target.Item.Name))))
-            
-          {
-              CreateSpecificationRequest(this, new SpecificationEventArgs(target));
-          }
+            var specname = string.Format("{0}{1}{2}", target.Name , "Specification", Path.GetExtension(target.Item.Name));
+            if  (!NavigateTo(specname))
+            {
+                  CreateSpecificationRequest(this, new SpecificationEventArgs(target, specname));
+            }
         }
 
         /// <summary>
@@ -75,6 +75,14 @@ namespace GeorgeChen.MavenThought_VSExtension.command
         private void Open(SenarioItem item)
         {
             Open(item.Specification);
+        }  
+        /// <summary>
+        /// Open a senario item
+        /// </summary>
+        /// <param name="item"></param>
+        private void Open(OtherItem item)
+        {
+            
         }
 
         private bool NavigateTo(string target)

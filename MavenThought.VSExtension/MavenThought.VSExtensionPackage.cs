@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using System.Windows;
 using EnvDTE;
 using EnvDTE80;
 using GeorgeChen.MavenThought_VSExtension.command;
@@ -71,7 +75,56 @@ namespace GeorgeChen.MavenThought_VSExtension
 
         private void HandleCreateSpecificationRequest(object sender, SpecificationEventArgs e)
         {
-          /// dte.Solution.FindProjectItem()
+            var testProjectname = string.Format("{0}.Tests", e.Source.Item.ContainingProject.Name);
+            var targetProject = FindProject(dte.Solution.Projects.Cast<Project>(), testProjectname);
+
+            if (targetProject!=null)
+            {
+                MessageBox.Show(string.Format("Do you want to create test project {0}?", testProjectname));
+                //var specitem = targetProject.ProjectItems.AddFromTemplate(e.SpecName, e.SpecName);
+                //var w = specitem.Open(Constants.vsViewKindCode);
+                //w.Visible = true;
+            }
+        }
+
+        private Project FindProject(IEnumerable<Project> projects, string testProjectname)
+        {
+            if (projects == null || projects.Count() == 0)
+            {
+                return null;
+            }
+
+           var target = projects.FirstOrDefault(p => p.Name == testProjectname &&  p.Kind != ProjectKinds.vsProjectKindSolutionFolder);
+
+           if (target!= null)
+           {
+               return target;
+           }
+
+           var solutionfoleders = projects.Where(p => p.Kind == ProjectKinds.vsProjectKindSolutionFolder);
+
+           return FindProject(solutionfoleders.Where(folder => folder.ProjectItems != null).SelectMany(folder => folder.ProjectItems.Cast<ProjectItem>()), testProjectname);
+        }
+
+        private Project FindProject(IEnumerable<ProjectItem> items, string testProjectname)
+        {
+            if (items == null || items.Count() == 0)
+            {
+                return null;
+            }
+
+           var target = items.FirstOrDefault(item => (item.Name == testProjectname));
+            foreach (ProjectItem pr in items)
+            {
+                Debug.WriteLine("+++++ project item: " + pr.Name);
+            }
+
+           if (target != null)
+           {
+               return target.Object as Project;
+           }
+
+           return FindProject(items.Where(item => item.SubProject !=null).Select(item => item.SubProject), testProjectname);
         }
     }
 }
