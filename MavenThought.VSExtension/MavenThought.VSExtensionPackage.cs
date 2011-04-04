@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.Windows;
 using EnvDTE;
 using EnvDTE80;
-using EnvDTE90;
 using GeorgeChen.MavenThought_VSExtension.command;
 using GeorgeChen.MavenThought_VSExtension.model;
 using GeorgeChen.MavenThought_VSExtension.OptionDialog;
@@ -28,6 +25,7 @@ namespace GeorgeChen.MavenThought_VSExtension
     {
         DTE2 dte;
         private NavigateCommand navigateCmd;
+        private AddSpecificationCommand addSpecificationCommand;
 
 
         /// <summary>
@@ -81,16 +79,21 @@ namespace GeorgeChen.MavenThought_VSExtension
 
             if (targetProject==null)
             {
-                MessageBox.Show(string.Format("Do you want to create test project {0}?", testProjectname));
+                MessageBox.Show(string.Format("You need create a test project {0} first.", testProjectname));
                 //var specitem = targetProject.ProjectItems.AddFromTemplate(e.SpecName, e.SpecName);
                 //var w = specitem.Open(Constants.vsViewKindCode);
                 //w.Visible = true;
+                return;
             }
-            else
+
+            e.targetProject = targetProject;
+
+            if (addSpecificationCommand == null)
             {
-                var templatePath = ((Solution3) dte.Solution).GetProjectItemTemplate("MaventThought.Test.Specification.Zip", "CSharp");
-                targetProject.ProjectItems.AddFromTemplate(templatePath, e.SpecName);
+                addSpecificationCommand = new AddSpecificationCommand(dte);
             }
+
+            addSpecificationCommand.Execute(e);
         }
 
         private Project FindProject(IEnumerable<Project> projects, string testProjectname)

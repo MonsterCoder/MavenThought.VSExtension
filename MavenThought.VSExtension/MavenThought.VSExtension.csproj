@@ -113,6 +113,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="command\AddSpecificationCommand.cs" />
     <Compile Include="command\NavigateCommand.cs" />
     <Compile Include="command\SpecificationEventArgs.cs" />
     <Compile Include="model\ClassItem.cs" />
