@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Windows.Input;
+using EnvDTE;
 using EnvDTE80;
 using EnvDTE90;
 
@@ -26,9 +29,63 @@ namespace GeorgeChen.MavenThought_VSExtension.command
             }
 
             var e = parameter as SpecificationEventArgs;
+            var path = new List<ProjectItem>();
+
+            var projectItems = e.Source.Item.ContainingProject.ProjectItems;
+            VisitPath(path, e.Source.Item.Name, projectItems);
 
             var templatePath = ((Solution3)_dte.Solution).GetProjectItemTemplate("MaventThought.Test.Specification.Zip", "CSharp");
-            e.targetProject.ProjectItems.AddFromTemplate(templatePath, e.SpecName);
+
+            if (path.Count == 0)
+            {
+                e.targetProject.ProjectItems.AddFromTemplate(templatePath, e.SpecName);
+            }
+            else
+            {
+                path.Reverse();
+                ProjectItem current = null;
+
+                foreach (var folder in path)
+                {
+                    if (current == null)
+                    {
+                        current = e.targetProject.ProjectItems.Cast<ProjectItem>().FirstOrDefault(p => p.Name == folder.Name) ??
+                               e.targetProject.ProjectItems.AddFolder(folder.Name);
+                    }
+                    else
+                    {
+
+                        current = current.ProjectItems.Cast<ProjectItem>().FirstOrDefault(p => p.Name == folder.Name) ??
+                                   current.ProjectItems.AddFolder(folder.Name); 
+                    }
+                }
+
+                current.ProjectItems.AddFromTemplate(templatePath, e.SpecName);
+            }
+        }
+
+        private bool VisitPath(ICollection<ProjectItem> path, string itemname, ProjectItems projectItems)
+        {
+            if (projectItems == null || projectItems.Count == 0)
+            {
+                return false;
+            }
+
+            if (projectItems.Cast<ProjectItem>().Any(i => i.Name == itemname))
+            {
+                return !(projectItems.Parent is Project);
+            }
+
+            foreach (ProjectItem projectItem in projectItems)
+            {
+                if  (VisitPath(path, itemname, projectItem.ProjectItems))
+                {
+                    path.Add(projectItem);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
