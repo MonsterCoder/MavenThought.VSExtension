@@ -8,6 +8,7 @@ using System.ComponentModel.Design;
 using System.Windows;
 using EnvDTE;
 using EnvDTE80;
+using EnvDTE90;
 using GeorgeChen.MavenThought_VSExtension.command;
 using GeorgeChen.MavenThought_VSExtension.model;
 using GeorgeChen.MavenThought_VSExtension.OptionDialog;
@@ -87,7 +88,8 @@ namespace GeorgeChen.MavenThought_VSExtension
             }
             else
             {
-               /// targetProject.ProjectItems.AddFromTemplate("CSharpProjects", "CSharpProjects");
+                var templatePath = ((Solution3) dte.Solution).GetProjectItemTemplate("MaventThought.Test.Specification.Zip", "CSharp");
+                targetProject.ProjectItems.AddFromTemplate(templatePath, e.SpecName);
             }
         }
 
